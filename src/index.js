@@ -18,12 +18,12 @@ function streamClusters(call, callback) {
       https://github.com/envoyproxy/envoy/blob/master/api/envoy/api/v2/discovery.proto#L18
     */
     const params = {
-      'version_info'	: request.getVersionInfo(), 			// #1
-      'node'					: request.getNode(), 							// #2
-      'resource_names': request.getResourceNamesList(), // #3
-      'type_url'			: request.getTypeUrl(), 					// #4
-      'response_nonce': request.getResponseNonce(), 		// #5
-      'error_detail'	: request.getErrorDetail(), 			// #6
+      'version_info': request.getVersionInfo(),
+      'node': request.getNode(),
+      'resource_names': request.getResourceNamesList(),
+      'type_url': request.getTypeUrl(),
+      'response_nonce': request.getResponseNonce(),
+      'error_detail': request.getErrorDetail(),
     }
     //console.log(JSON.stringify(params, null, 2))
 
