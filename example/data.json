@@ -1,5 +1,5 @@
 {
-	"eds_config": {
+	"eds": {
 		"remote_site": [
 			{
 				"cluster_name": "remote_site",
@@ -21,5 +21,54 @@
 				]
 			}
 		]
+	},
+	"lds": {
+		"service_b": {
+			"nonce": "service_b_1",
+			"resourcesList": [
+				{
+					"address": {
+						"socket_address": {
+							"address": "0.0.0.0",
+							"port_value": "80"
+						}
+					},
+					"filter_chains": [
+						{
+							"filters": [
+								{
+									"name": "envoy.http_connection_manager",
+									"config": {
+										"codec_type": "auto",
+										"stat_prefix": "ingress_http",
+										"route_config": {
+											"name": "local_route",
+											"virtual_hosts": [
+												{
+													"name": "service",
+													"domains": [
+														"*"
+													],
+													"routes": [
+														{
+															"match": {
+																"prefix": "/"
+															},
+															"route": {
+																"cluster": "local_service_b"
+															}
+														}
+													]
+												}
+											]
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			]
+		}
 	}
 }

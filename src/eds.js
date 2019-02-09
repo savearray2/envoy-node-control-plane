@@ -1,10 +1,13 @@
+const edsServices = require('./pb/envoy/api/v2/eds_grpc_pb')
 const discoveryRequest = require('./discoveryRequest')
 const discovery = require('./pb/envoy/api/v2/discovery_pb')
 const edsPB = require('./pb/envoy/api/v2/eds_pb')
 const endpointPB = require('./pb/envoy/api/v2/endpoint/endpoint_pb')
 const addressPB = require('./pb/envoy/api/v2/core/address_pb')
-const googlePBAny = require('google-protobuf/google/protobuf/any_pb.js');
-const data = require('./data')
+const googlePBAny = require('google-protobuf/google/protobuf/any_pb.js')
+
+// passed storage module
+let store
 
 function streamEndpoints(call, callback) {
 	console.log('stream endpoints called')
@@ -12,7 +15,7 @@ function streamEndpoints(call, callback) {
 		// deconstruct incoming request message
 		const params = discoveryRequest( request )
 		// get stored data for requested resource name 
-		const storedData = data.getData( 'eds_config', params.resource_names[ 0 ])
+		const storedData = store.get( 'eds', params.resource_names[ 0 ])
 
 		// build discovery response
 		const response = new discovery.DiscoveryResponse()
@@ -88,5 +91,14 @@ function fetchEndpoints(call, callback) {
 	console.log('stream endpoints called')
 }
 
-exports.streamEndpoints = streamEndpoints
-exports.fetchEndpoints = fetchEndpoints
+exports.registerServices = function ( server, configStore ) {
+	store = configStore 
+
+	server.addService(
+    edsServices.EndpointDiscoveryServiceService, 
+    {
+      streamEndpoints: streamEndpoints,
+      fetchEndpoints: fetchEndpoints
+    }
+  )
+}

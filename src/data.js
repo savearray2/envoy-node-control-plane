@@ -1,6 +1,12 @@
 const fs = require('fs')
 const data = JSON.parse(fs.readFileSync('./data.json', 'utf8'))
 
-exports.getData = function getData ( resourceType, resourceName ) {
-	return data[ resourceType ][ resourceName ]
+exports.get = function getData ( xds, requestParams ) {
+	if ( xds === 'lds' ) {
+		return data[ xds ] && data[ xds ][ requestParams.node.id ] || undefined
+	} else if ( xds === 'eds' ) {
+		return data[ xds ] && data[ xds ][ resourceNames[ 0 ] ] || undefined
+	}
+	
+	return undefined
 }
