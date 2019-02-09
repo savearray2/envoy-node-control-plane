@@ -10,12 +10,12 @@ const googleStruct = require('google-protobuf/google/protobuf/struct_pb.js')
 let store
 
 function streamListeners(call, callback) {
-	// console.log('stream listeners')
+	console.log('stream listeners')
 	call.on('data', function( request ) {
 		// deconstruct incoming request message
 		const params = discoveryRequest( request )
 		//console.log(JSON.stringify( params, null, 2 ))
-		
+
 		// get stored data for request
 		const storedData = store.get( 'lds', params )
 		if ( !storedData ) {

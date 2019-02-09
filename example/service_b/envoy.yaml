@@ -12,23 +12,23 @@ dynamic_resources:
       grpc_services:
         envoy_grpc:
           cluster_name: xds_cluster
-  #cds_config:
-  #  api_config_source:
-  #    api_type: GRPC
-  #    grpc_services:
-  #      envoy_grpc:
-  #        cluster_name: xds_cluster
+  cds_config:
+    api_config_source:
+      api_type: GRPC
+      grpc_services:
+        envoy_grpc:
+          cluster_name: xds_cluster
 
 static_resources:
   clusters:
-  - name: local_service_b
-    connect_timeout: 0.25s
-    type: strict_dns
-    lb_policy: round_robin
-    hosts:
-    - socket_address:
-        address: service_b
-        port_value: 3002
+  #- name: local_service_b
+  #  connect_timeout: 0.25s
+  #  type: strict_dns
+  #  lb_policy: round_robin
+  #  hosts:
+  #  - socket_address:
+  #      address: service_b
+  #      port_value: 3002
   - name: xds_cluster
     connect_timeout: 0.25s
     type: strict_dns

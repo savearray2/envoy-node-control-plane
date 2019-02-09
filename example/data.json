@@ -1,4 +1,44 @@
 {
+	"cds": {
+		"service_b": {
+			"nonce": "service_b_1",
+			"resourcesList": [
+				{
+					"name": "local_service_b",
+					"connect_timeout": "25",
+    			"type": "STRICT_DNS",
+					"lb_policy": "ROUND_ROBIN",
+					"load_assignment": {
+						"cluster_name": "local_service_b",
+						"endpoints": [
+							{
+								"lb_endpoints": [
+									{
+										"endpoint": {
+											"address": {
+												"socket_address": {
+													"address": "service_b",
+													"port_value": "3002"
+												}
+											}
+										}
+									}
+								]
+							}
+						]
+					},
+    			"hosts": [
+						{
+							"socket_address": {
+								"address": "service_b",
+								"port_value": "3002"
+							}
+						}
+					]
+				}
+			]
+		}
+	},
 	"eds": {
 		"remote_site": [
 			{
@@ -61,7 +101,13 @@
 													]
 												}
 											]
-										}
+										},
+										"http_filters": [
+											{
+											 "config": {},
+											 "name": "envoy.router"
+											}
+										]
 									}
 								}
 							]

@@ -4,11 +4,9 @@
 */
 var grpc = require('grpc')
 
-var cdsServices = require('./pb/envoy/api/v2/cds_grpc_pb')
 var cds = require('./cds')
-
-var eds = require('./eds')
 var lds = require('./lds')
+var eds = require('./eds')
 
 /**
  * Starts an RPC server that receives requests for the Greeter service at the
@@ -16,19 +14,11 @@ var lds = require('./lds')
  */
 function main() {
   var server = new grpc.Server();
-  
-  /*server.addService(
-    cdsServices.ClusterDiscoveryServiceService, 
-    {
-      streamClusters: cds.streamClusters,
-      incrementalClusters: cds.incrementalClusters,
-      fetchClusters: cds.fetchClusters
-    }
-  )*/
-
   const store = require('./data')
-  eds.registerServices( server, store )
+  
+  cds.registerServices( server, store )
   lds.registerServices( server, store )
+  eds.registerServices( server, store )
 
   server.bind('0.0.0.0:3000', grpc.ServerCredentials.createInsecure());
   server.start();
