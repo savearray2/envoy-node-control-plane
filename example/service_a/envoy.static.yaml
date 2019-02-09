@@ -18,9 +18,9 @@ static_resources:
               - "*"
               routes:
               - match:
-                  prefix: "/healthcheck"
+                  prefix: "/service-b"
                 route:
-                  cluster: remote_site
+                  cluster: service_b
               - match:
                   prefix: "/"
                 route:
@@ -37,31 +37,14 @@ static_resources:
     - socket_address:
         address: service_a
         port_value: 3001
-  - name: remote_site
-    connect_timeout: 0.25s
-    lb_policy: ROUND_ROBIN
-    type: EDS
-    eds_cluster_config:
-      eds_config:
-        api_config_source:
-          api_type: GRPC
-          grpc_services:
-            envoy_grpc:
-              cluster_name: xds_cluster
-  - name: xds_cluster
+  - name: service_b
     connect_timeout: 0.25s
     type: strict_dns
-    lb_policy: ROUND_ROBIN
-    http2_protocol_options: {}
-    load_assignment:
-      cluster_name: xds_cluster
-      endpoints:
-      - lb_endpoints:
-        - endpoint:
-            address:
-              socket_address:
-                address: xds
-                port_value: 3000
+    lb_policy: round_robin
+    hosts:
+    - socket_address:
+        address: service_b
+        port_value: 3002
 admin:
   access_log_path: "/dev/null"
   address:

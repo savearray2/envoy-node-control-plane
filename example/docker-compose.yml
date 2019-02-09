@@ -4,8 +4,15 @@ services:
     image: node:alpine
     volumes:
       - ../src:/opt/app
+      - ./data.json:/opt/app/data.json
     working_dir: /opt/app
     command: node index.js
+    ports:
+      - "3000:3000"
+    networks:
+      envoymesh:
+        aliases:
+          - xds
   
   service-a:
     image: node:alpine
@@ -31,29 +38,29 @@ services:
     networks:
       - envoymesh
 
-  service-b:
-    image: node:alpine
-    working_dir: /opt/app
-    volumes:
-      - ./service_b/index.js:/opt/app/index.js
-    command: node index.js
-    ports:
-      - "3002:3002"
-    networks:
-      envoymesh:
-        aliases:
-          - service_b
-
-  service-b-envoy:
-    image: envoyproxy/envoy:latest
-    volumes:
-      - ./service_b/envoy.yaml:/etc/envoy.yaml
-    ports:
-      - "8081:80"
-      - "8002:8001"
-    command: /usr/local/bin/envoy -c /etc/envoy.yaml --service-cluster service_b --service-node service_b
-    networks:
-      - envoymesh
-
+  #service-b:
+  #  image: node:alpine
+  #  working_dir: /opt/app
+  #  volumes:
+  #    - ./service_b/index.js:/opt/app/index.js
+  #  command: node index.js
+  #  ports:
+  #    - "3002:3002"
+  #  networks:
+  #    envoymesh:
+  #      aliases:
+  #        - service_b
+#
+  #service-b-envoy:
+  #  image: envoyproxy/envoy:latest
+  #  volumes:
+  #    - ./service_b/envoy.yaml:/etc/envoy.yaml
+  #  ports:
+  #    - "8081:80"
+  #    - "8002:8001"
+  #  command: /usr/local/bin/envoy -c /etc/envoy.yaml --service-cluster service_b --service-node service_b
+  #  networks:
+  #    - envoymesh
+#
 networks:
   envoymesh: {}

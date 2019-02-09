@@ -1,0 +1,25 @@
+{
+	"eds_config": {
+		"remote_site": [
+			{
+				"cluster_name": "remote_site",
+				"endpoints": [
+					{
+						"lb_endpoints": [
+							{
+								"endpoint": {
+									"address": {
+										"socket_address": {
+											"address": "54.242.145.125",
+											"port_value": "32772"
+										}
+									}
+								}
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}
