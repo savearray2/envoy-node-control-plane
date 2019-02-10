@@ -1,14 +1,35 @@
 const fs = require('fs')
 const data = JSON.parse(fs.readFileSync('./data.json', 'utf8'))
 
-exports.get = function getData ( xds, requestParams ) {
-	if ( xds === 'lds' ) {
-		return data[ xds ] && data[ xds ][ requestParams.node.id ] || undefined
-	} else if ( xds === 'eds' ) {
-		return data[ xds ] && data[ xds ][ resourceNames[ 0 ] ] || undefined
-	} else if ( xds === 'cds' ) {
-		return data[ xds ] && data[ xds ][ requestParams.node.id ] || undefined
+exports.get = function getData ( requestParams ) {
+	switch( requestParams.typeUrl ) {
+		case 'type.googleapis.com/envoy.api.v2.Cluster': {
+			return data.cds && data.cds[ requestParams.node.id ] || undefined
+		}
+		case 'type.googleapis.com/envoy.api.v2.Listener': {
+			return data.lds && data.lds[ requestParams.node.id ] || undefined
+		}
+		case 'type.googleapis.com/envoy.api.v2.RouteConfiguration': {
+			const nodeId = requestParams.node.id
+			const routeNames = requestParams.resourceNamesList
+			if ( !data.rds || !data.rds[ nodeId] ) {
+				return undefined
+			}
+			
+			const resourcesList = data.rds[ nodeId].resourcesList.filter((resource) => {
+				return routeNames.indexOf( resource.name ) > -1
+			})
+
+			if ( resourcesList.length > 0 ) {
+				return {
+					nonce: data.rds[ nodeId].nonce,
+					resourcesList
+				}
+			}
+
+			return undefined
+		}
+	default:
+		return undefined
 	}
-	
-	return undefined
 }

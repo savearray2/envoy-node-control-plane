@@ -6,6 +6,8 @@ var grpc = require('grpc')
 
 var cds = require('./cds')
 var lds = require('./lds')
+var rds = require('./rds')
+
 var eds = require('./eds')
 
 /**
@@ -18,6 +20,7 @@ function main() {
   
   cds.registerServices( server, store )
   lds.registerServices( server, store )
+  rds.registerServices( server, store )
   eds.registerServices( server, store )
 
   server.bind('0.0.0.0:3000', grpc.ServerCredentials.createInsecure());

@@ -85,7 +85,35 @@ const data = {
 				}
 			]
 		}
-	}
+	},
+	"rds": {
+    "test_node": {
+      "nonce": "test_node_nonce",
+      "resourcesList": [
+        {
+          "name": "local_route",
+          "virtual_hosts": [
+            {
+              "name": "service",
+              "domains": [
+                "*"
+              ],
+              "routes": [
+                {
+                  "match": {
+                    "prefix": "/"
+                  },
+                  "route": {
+                    "cluster": "test_cluster"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
 }
 
 exports.get = function getData ( requestParams ) {
@@ -95,6 +123,26 @@ exports.get = function getData ( requestParams ) {
 		}
 		case 'type.googleapis.com/envoy.api.v2.Listener': {
 			return data.lds && data.lds[ requestParams.node.id ] || undefined
+		}
+		case 'type.googleapis.com/envoy.api.v2.RouteConfiguration': {
+			const nodeId = requestParams.node.id
+			const routeNames = requestParams.resourceNamesList
+			if ( !data.rds || !data.rds[ nodeId] ) {
+				return undefined
+			}
+			
+			const resourcesList = data.rds[ nodeId].resourcesList.filter((resource) => {
+				return routeNames.indexOf( resource.name ) > -1
+			})
+
+			if ( resourcesList.length > 0 ) {
+				return {
+					nonce: data.rds[ nodeId].nonce,
+					resourcesList
+				}
+			}
+
+			return undefined
 		}
 	default:
 		return undefined
