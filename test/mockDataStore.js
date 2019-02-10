@@ -113,7 +113,28 @@ const data = {
         }
       ]
     }
-  }
+	},
+	"eds": [
+    {
+      "cluster_name": "test_cluster",
+      "endpoints": [
+        {
+          "lb_endpoints": [
+            {
+              "endpoint": {
+                "address": {
+                  "socket_address": {
+                    "address": "54.242.145.125",
+                    "port_value": "32772"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
 
 exports.get = function getData ( requestParams ) {
@@ -138,6 +159,21 @@ exports.get = function getData ( requestParams ) {
 			if ( resourcesList.length > 0 ) {
 				return {
 					nonce: data.rds[ nodeId].nonce,
+					resourcesList
+				}
+			}
+
+			return undefined
+		}
+		case 'type.googleapis.com/envoy.api.v2.ClusterLoadAssignment': {
+			const routeNames = requestParams.resourceNamesList
+
+			const resourcesList = data.eds.filter((resource) => {
+				return routeNames.indexOf( resource.cluster_name ) > -1
+			})
+
+			if ( resourcesList.length > 0 ) {
+				return {
 					resourcesList
 				}
 			}
