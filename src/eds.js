@@ -1,17 +1,13 @@
 const edsServices = require('./pb/envoy/api/v2/eds_grpc_pb')
-const discoveryRequest = require('./discoveryRequest')
 const discovery = require('./pb/envoy/api/v2/discovery_pb')
-const edsPB = require('./pb/envoy/api/v2/eds_pb')
-const endpointPB = require('./pb/envoy/api/v2/endpoint/endpoint_pb')
-const addressPB = require('./pb/envoy/api/v2/core/address_pb')
 const googlePBAny = require('google-protobuf/google/protobuf/any_pb.js')
-const crypto = require('crypto')
+const makeResponseNonce = require('./util/response-nonce')
+const messages = require('./util/messages')
 
 // passed storage module
 let store
 
-function streamEndpoints(call, callback) {
-  // console.log('stream endpoints called')
+function streamEndpoints(call) {
   call.on('data', function( request ) {
     const params = request.toObject()
     // console.log(JSON.stringify( params, null, 2 ))
@@ -23,9 +19,8 @@ function streamEndpoints(call, callback) {
       return this.end()
     }
 
-    const nonce = crypto.createHash('md5').update(JSON.stringify( storedData )).digest('hex').slice(0, 10)
-
     // check for nonce to stop infinite updates
+    const nonce = makeResponseNonce( storedData )
     if ( params.responseNonce === nonce ) {
       return this.end()
     }
@@ -42,51 +37,8 @@ function streamEndpoints(call, callback) {
       const any = new googlePBAny.Any()
 
       // create ClusterLoadAssignment message
-      // https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/eds.proto#clusterloadassignment
-      const clusterLoadAssignment = new edsPB.ClusterLoadAssignment()
-      clusterLoadAssignment.setClusterName( dataResource.cluster_name )
-
-      // build endpoints to assign
-      const endpoints = dataResource.endpoints.map( function ( dataEndpoint ) {
-        // create LocalityLbEndpoints message
-        // https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/endpoint/endpoint.proto#envoy-api-msg-endpoint-localitylbendpoints
-        const localityLbEndpoints = new endpointPB.LocalityLbEndpoints()
-
-        // build lbendpoints to assign 
-        const lbEndpoints = dataEndpoint.lb_endpoints.map( function ( dataLbEndpoint ) {
-          // create LbEndpoint message
-          // https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/endpoint/endpoint.proto#envoy-api-msg-endpoint-lbendpoint
-          const lbEndpoint = new endpointPB.LbEndpoint()
-          // create Endpoint message 
-          // https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/endpoint/endpoint.proto#envoy-api-msg-endpoint-endpoint
-          const endpoint = new endpointPB.Endpoint()
-          // create Address message 
-          // https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/core/address.proto#envoy-api-msg-core-address
-          const address = new addressPB.Address()
-          // create SocketAddress message 
-          // https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/core/address.proto#envoy-api-msg-core-socketaddress
-          const socketAddress = new addressPB.SocketAddress()
-          // assign values to socket address
-          socketAddress.setAddress( dataLbEndpoint.endpoint.address.socket_address.address )
-          socketAddress.setPortValue( dataLbEndpoint.endpoint.address.socket_address.port_value )
-          // assign socket address to address
-          address.setSocketAddress( socketAddress )
-          // assign address to endpoint
-          endpoint.setAddress( address )
-          // assign endpoint to lb endpoint
-          lbEndpoint.setEndpoint( endpoint )
-
-          return lbEndpoint
-        })
-        // assign lb endpoints to locality lb endpoint
-        localityLbEndpoints.setLbEndpointsList( lbEndpoints )
-  
-        return localityLbEndpoints
-      }) 
-
-      // assign endpoints to cluster
-      clusterLoadAssignment.setEndpointsList( endpoints )
-
+      const clusterLoadAssignment = messages.buildClusterLoadAssignment( dataResource )
+      
       // pack cluster load assignment message into any
       any.pack( clusterLoadAssignment.serializeBinary(), 'envoy.api.v2.ClusterLoadAssignment')
 

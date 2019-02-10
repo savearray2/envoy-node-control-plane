@@ -1,14 +1,13 @@
 const rdsServices = require('./pb/envoy/api/v2/rds_grpc_pb')
-const discoveryRequest = require('./discoveryRequest')
 const discovery = require('./pb/envoy/api/v2/discovery_pb')
 const rdsPB = require('./pb/envoy/api/v2/rds_pb')
 const routePB = require('./pb/envoy/api/v2/route/route_pb')
 const googlePBAny = require('google-protobuf/google/protobuf/any_pb.js')
+const makeResponseNonce = require('./util/response-nonce')
 
 let store
 
-function streamRoutes(call, callback) {
-  // console.log('stream listeners')
+function streamRoutes(call) {
   call.on('data', function( request ) {
     const params = request.toObject()
     // console.log(JSON.stringify( params, null, 2 ))
@@ -21,15 +20,16 @@ function streamRoutes(call, callback) {
     }
     
     // check for nonce to stop infinite updates
-    if ( params.responseNonce === storedData.nonce ) {
+    const nonce = makeResponseNonce( storedData )
+    if ( params.responseNonce === nonce ) {
       return this.end()
-		}
+    }
 
     // build discovery response
     const response = new discovery.DiscoveryResponse()
     response.setVersionInfo( 0 )
     response.setTypeUrl( 'type.googleapis.com/envoy.api.v2.RouteConfiguration' )
-    response.setNonce( storedData.nonce )
+    response.setNonce( nonce )
 
     // build resources to assign
     const resourcesList = storedData.resourcesList.map( function ( dataResource ) {

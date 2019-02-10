@@ -83,7 +83,6 @@ describe('Listener Discovery Service', () => {
 				)
 				.toObject()
 				expect( listener ).toBeTruthy()
-				expect(result.nonce).toEqual('test_node_nonce')
 				done()
 			})
 	

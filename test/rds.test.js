@@ -89,7 +89,6 @@ describe('Route Discovery Service', () => {
 				)
 				.toObject()
 				expect( routeConfiguration ).toBeTruthy()
-				expect(result.nonce).toEqual('test_node_nonce')
 				done()
 			})
 	

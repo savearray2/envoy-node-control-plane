@@ -84,7 +84,6 @@ describe('Cluster Discovery Service', () => {
 				.toObject()
 				expect( cluster ).toBeTruthy()
 				expect( cluster.name ).toEqual( 'some_service' )
-				expect(result.nonce).toEqual('test_node_nonce')
 				done()
 			})
 	
