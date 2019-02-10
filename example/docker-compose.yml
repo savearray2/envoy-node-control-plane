@@ -3,10 +3,10 @@ services:
   xds:
     image: node:alpine
     volumes:
-      - ../src:/opt/app
+      - ../:/opt/app
       - ./data.json:/opt/app/data.json
     working_dir: /opt/app
-    command: node index.js
+    command: node src/index.js
     ports:
       - "3000:3000"
     networks:

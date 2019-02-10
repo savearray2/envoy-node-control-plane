@@ -12,19 +12,18 @@ let store
 function streamListeners(call, callback) {
   // console.log('stream listeners')
   call.on('data', function( request ) {
-    // deconstruct incoming request message
-    const params = discoveryRequest( request )
-    //console.log(JSON.stringify( params, null, 2 ))
+    const params = request.toObject()
+    // console.log(JSON.stringify( params, null, 2 ))
 
     // get stored data for request
-    const storedData = store.get( 'lds', params )
+    const storedData = store.get( params )
     if ( !storedData ) {
-      console.log('NO DATA AVAILABLE')
+      // console.log('NO DATA AVAILABLE')
       return this.end()
     }
-
+    
     // check for nonce to stop infinite updates
-    if ( params.response_nonce === storedData.nonce ) {
+    if ( params.responseNonce === storedData.nonce ) {
       return this.end()
     }
 

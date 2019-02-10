@@ -1,5 +1,4 @@
 const cdsServices = require('./pb/envoy/api/v2/cds_grpc_pb')
-const discoveryRequest = require('./discoveryRequest')
 const discovery = require('./pb/envoy/api/v2/discovery_pb')
 const cdsPB = require('./pb/envoy/api/v2/cds_pb')
 const edsPB = require('./pb/envoy/api/v2/eds_pb')
@@ -13,19 +12,18 @@ let store
 function streamClusters(call, callback) {
   // console.log('stream clusters>>>')
   call.on('data', function( request ) {
-    // deconstruct incoming request message
-    const params = discoveryRequest( request )
+    const params = request.toObject()
     // console.log(JSON.stringify( params, null, 2 ))
 
     // get stored data for request
-    const storedData = store.get( 'cds', params )
+    const storedData = store.get( params )
     if ( !storedData ) {
-      console.log('NO DATA AVAILABLE')
+      // console.log('NO DATA AVAILABLE')
       return this.end()
     }
-
+    
     // check for nonce to stop infinite updates
-    if ( params.response_nonce === storedData.nonce ) {
+    if ( params.responseNonce === storedData.nonce ) {
       return this.end()
     }
 
