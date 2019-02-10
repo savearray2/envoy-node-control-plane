@@ -29,6 +29,21 @@ exports.get = function getData ( requestParams ) {
 
 			return undefined
 		}
+		case 'type.googleapis.com/envoy.api.v2.ClusterLoadAssignment': {
+			const routeNames = requestParams.resourceNamesList
+
+			const resourcesList = data.eds.filter((resource) => {
+				return routeNames.indexOf( resource.cluster_name ) > -1
+			})
+
+			if ( resourcesList.length > 0 ) {
+				return {
+					resourcesList
+				}
+			}
+
+			return undefined
+		}
 	default:
 		return undefined
 	}

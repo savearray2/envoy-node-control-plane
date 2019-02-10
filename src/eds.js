@@ -5,25 +5,39 @@ const edsPB = require('./pb/envoy/api/v2/eds_pb')
 const endpointPB = require('./pb/envoy/api/v2/endpoint/endpoint_pb')
 const addressPB = require('./pb/envoy/api/v2/core/address_pb')
 const googlePBAny = require('google-protobuf/google/protobuf/any_pb.js')
+const crypto = require('crypto')
 
 // passed storage module
 let store
 
 function streamEndpoints(call, callback) {
-  console.log('stream endpoints called')
+  // console.log('stream endpoints called')
   call.on('data', function( request ) {
-    // deconstruct incoming request message
-    const params = discoveryRequest( request )
-    // get stored data for requested resource name 
-    const storedData = store.get( 'eds', params.resource_names[ 0 ])
+    const params = request.toObject()
+    // console.log(JSON.stringify( params, null, 2 ))
+
+    // get stored data for request
+    const storedData = store.get( params )
+    if ( !storedData ) {
+      // console.log('NO DATA AVAILABLE')
+      return this.end()
+    }
+
+    const nonce = crypto.createHash('md5').update(JSON.stringify( storedData )).digest('hex').slice(0, 10)
+
+    // check for nonce to stop infinite updates
+    if ( params.responseNonce === nonce ) {
+      return this.end()
+    }
 
     // build discovery response
     const response = new discovery.DiscoveryResponse()
     response.setVersionInfo( 0 )
     response.setTypeUrl( 'type.googleapis.com/envoy.api.v2.ClusterLoadAssignment' )
+    response.setNonce( nonce )
 
     // build resources to assign
-    const resourcesList = storedData.map( function ( dataResource ) {
+    const resourcesList = storedData.resourcesList.map( function ( dataResource ) {
       // for each resource, great a google protobuf Any buffer message
       const any = new googlePBAny.Any()
 
