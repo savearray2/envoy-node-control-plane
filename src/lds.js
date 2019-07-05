@@ -44,7 +44,11 @@ function streamListeners(call) {
       const listener = new ldsPB.Listener()
 
       // create Address message 
-      const address = messages.buildAddress( dataResource.address )
+	  const address = messages.buildAddress( dataResource.address )
+	  
+	  if (dataResource.name) {
+		  listener.setName(dataResource.name)
+	  }
 
       // assign address 
       listener.setAddress( address )
