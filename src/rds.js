@@ -22,9 +22,9 @@ function streamRoutes(call) {
     // check for nonce to stop infinite updates
     const nonce = makeResponseNonce( storedData )
     console.log(`RDS params.responseNonce ${params.responseNonce} // nonce ${nonce}`)
-    //if ( params.responseNonce === nonce ) {
-    //  return this.end()
-    //}
+    if ( params.responseNonce === nonce ) {
+      return this.end()
+    }
 
     // build discovery response
     const response = new discovery.DiscoveryResponse()
