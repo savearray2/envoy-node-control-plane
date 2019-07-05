@@ -22,9 +22,10 @@ function streamClusters(call) {
     
     // check for nonce to stop infinite updates
     const nonce = makeResponseNonce( storedData )
-    if ( params.responseNonce === nonce ) {
-      return this.end()
-    }
+    console.log(`CDS params.responseNonce ${params.responseNonce} // nonce ${nonce}`)
+    //if ( params.responseNonce === nonce ) {
+    //  return this.end()
+    //}
 
     // build discovery response
     const response = new discovery.DiscoveryResponse()
