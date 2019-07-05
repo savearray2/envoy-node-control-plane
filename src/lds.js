@@ -16,16 +16,16 @@ function streamListeners(call) {
 
     // get stored data for request
     const storedData = store.get( params )
-    //if ( !storedData ) {
+    if ( !storedData ) {
     //  console.log('NO DATA AVAILABLE')
-    //  return this.end()
-    //}
+      return //this.end()
+    }
     
     // check for nonce to stop infinite updates
     const nonce = makeResponseNonce( storedData )
     console.log(`LDS params.responseNonce ${params.responseNonce} // nonce ${nonce}`)
     if ( params.responseNonce === nonce ) {
-      return this.end()
+      return //this.end()
     }
 
     // build discovery response
