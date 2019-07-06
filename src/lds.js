@@ -1,6 +1,7 @@
 const ldsServices = require('./pb/envoy/api/v2/lds_grpc_pb')
 const discovery = require('./pb/envoy/api/v2/discovery_pb')
 const ldsPB = require('./pb/envoy/api/v2/lds_pb')
+const certPB = require('./pb/envoy/api/v2/auth/cert_pb')
 const listenerPB = require('./pb/envoy/api/v2/listener/listener_pb.js')
 const googlePBAny = require('google-protobuf/google/protobuf/any_pb.js')
 const googleStruct = require('google-protobuf/google/protobuf/struct_pb.js')
@@ -68,7 +69,19 @@ function streamListeners(call) {
       const filterChains = dataResource.filter_chains.map( function ( dataFilterChain ) {
         // build filterChain 
         // https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/listener/listener.proto#envoy-api-msg-listener-filterchain
-        const filterChain = new listenerPB.FilterChain()
+		const filterChain = new listenerPB.FilterChain()
+		
+		if (dataFilterChain.tls_context) {
+			const tlsContext = new certPB.DownstreamTlsContext()
+			const commonTlsCtx = new certPB.CommonTlsContext()
+
+			if (dataFilterChain.tls_context.alpn_protocols) {
+				commonTlsCtx.setAlpnProtocolsList(dataFilterChain.tls_context.alpn_protocols)
+			}
+			
+			tlsContext.setCommonTlsContext(commonTlsCtx)
+			filterChain.setTlsContext(tlsContext)
+		}
 
         // build filters 
         const filters = dataFilterChain.filters.map( function ( dataFilter ) {
@@ -82,7 +95,7 @@ function streamListeners(call) {
           const config = googleStruct.Struct.fromJavaScript( dataFilter.config )
 
           // assign config to filter 
-          filter.setConfig( config )
+		  filter.setConfig( config )
 
           return filter
         })
