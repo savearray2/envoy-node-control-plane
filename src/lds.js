@@ -71,6 +71,14 @@ function streamListeners(call) {
         // build filterChain 
         // https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/listener/listener.proto#envoy-api-msg-listener-filterchain
 		const filterChain = new listenerPB.FilterChain()
+
+		if (dataFilterChain.filter_chain_match) {
+			const filterChainMatch = new listenerPB.FilterChainMatch()
+			if (dataFilterChain.filter_chain_match.server_names) {
+				filterChainMatch.setServerNamesList(dataFilterChain.filter_chain_match.server_names)
+			}
+			filterChain.setFilterChainMatch(filterChainMatch)
+		}
 		
 		if (dataFilterChain.tls_context) {
 			const tlsContext = new certPB.DownstreamTlsContext()
