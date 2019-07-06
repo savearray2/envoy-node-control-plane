@@ -32,7 +32,7 @@ function streamListeners(call) {
     const response = new discovery.DiscoveryResponse()
     response.setVersionInfo( 0 )
     response.setTypeUrl( 'type.googleapis.com/envoy.api.v2.Listener' )
-    response.setNonce( nonce )
+	response.setNonce( nonce )
 
     // build resources to assign
     const resourcesList = storedData.resourcesList.map( function ( dataResource ) {
@@ -51,7 +51,17 @@ function streamListeners(call) {
 	  }
 
       // assign address 
-      listener.setAddress( address )
+	  listener.setAddress( address )
+
+      const listenerChains = dataResource.listener_filters.map( function ( dataFilterChain ) {
+		const listenerFilter = new listenerPB.ListenerFilter()
+		listenerFilter.setName( dataFilterChain.name )
+		const config = googleStruct.Struct.fromJavaScript( dataFilter.config )
+		listenerFilter.setConfig( config )
+		return listenerFilter
+	  })
+
+	  listener.setListenerFiltersList( listenerChains )
 
       // build filter chains 
       const filterChains = dataResource.filter_chains.map( function ( dataFilterChain ) {

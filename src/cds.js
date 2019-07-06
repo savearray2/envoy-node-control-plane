@@ -6,7 +6,7 @@ const googlePBDuration = require('google-protobuf/google/protobuf/duration_pb.js
 const makeResponseNonce = require('./util/response-nonce')
 const messages = require('./util/messages')
 
-let store 
+let store
 
 function streamClusters(call) {
   call.on('data', function( request ) {
