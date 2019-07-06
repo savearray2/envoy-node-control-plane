@@ -82,6 +82,7 @@ function streamListeners(call) {
 
 			if (dataFilterChain.tls_context.tls_certificates) {
 				const cert_list = dataFilterChain.tls_context.tls_certificates.map( function ( cert ) {
+					console.log(cert)
 					const tlsCertificate = new certPB.TlsCertificate()
 					const private_key = new basePB.DataSource()
 					if (cert.private_key.filename) {
