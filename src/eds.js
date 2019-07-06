@@ -21,7 +21,7 @@ function streamEndpoints(call) {
 
     // check for nonce to stop infinite updates
     const nonce = makeResponseNonce( storedData )
-    console.log(`EDS params.responseNonce ${params.responseNonce} // nonce ${nonce}`)
+    //console.log(`EDS params.responseNonce ${params.responseNonce} // nonce ${nonce}`)
     if ( params.responseNonce === nonce ) {
       return //this.end()
     }

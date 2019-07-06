@@ -23,7 +23,7 @@ function streamListeners(call) {
     
     // check for nonce to stop infinite updates
     const nonce = makeResponseNonce( storedData )
-    console.log(`LDS params.responseNonce ${params.responseNonce} // nonce ${nonce}`)
+    //console.log(`LDS params.responseNonce ${params.responseNonce} // nonce ${nonce}`)
     if ( params.responseNonce === nonce ) {
       return //this.end()
     }
