@@ -2,6 +2,7 @@ const ldsServices = require('./pb/envoy/api/v2/lds_grpc_pb')
 const discovery = require('./pb/envoy/api/v2/discovery_pb')
 const ldsPB = require('./pb/envoy/api/v2/lds_pb')
 const certPB = require('./pb/envoy/api/v2/auth/cert_pb')
+const basePB = require('./pb/envoy/api/v2/core/base_pb')
 const listenerPB = require('./pb/envoy/api/v2/listener/listener_pb.js')
 const googlePBAny = require('google-protobuf/google/protobuf/any_pb.js')
 const googleStruct = require('google-protobuf/google/protobuf/struct_pb.js')
@@ -77,6 +78,24 @@ function streamListeners(call) {
 
 			if (dataFilterChain.tls_context.alpn_protocols) {
 				commonTlsCtx.setAlpnProtocolsList(dataFilterChain.tls_context.alpn_protocols)
+			}
+
+			if (dataFilterChain.tls_context.tls_certificates) {
+				const cert_list = dataFilterChain.tls_context.tls_certificates.map( function ( cert ) {
+					const tlsCertificate = new certPB.TlsCertificate()
+					const private_key = new basePB.DataSource()
+					if (cert.private_key.filename) {
+						private_key.setFilename(cert.private_key.filename)
+					}
+					tlsCertificate.setPrivateKey(private_key)
+					const certificate_chain = new basePB.DataSource()
+					if (cert.certificate_chain.filename) {
+						certificate_chain.setFilename(cert.certificate_chain.filename)
+					}
+					tlsCertificate.setCertificateChain(certificate_chain)
+					return tlsCertificate
+				})
+				commonTlsCtx.setTlsCertificatesList(cert_list)
 			}
 			
 			tlsContext.setCommonTlsContext(commonTlsCtx)
