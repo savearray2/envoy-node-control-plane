@@ -53,15 +53,16 @@ function streamListeners(call) {
       // assign address 
 	  listener.setAddress( address )
 
-      const listenerChains = dataResource.listener_filters.map( function ( dataFilterChain ) {
-		const listenerFilter = new listenerPB.ListenerFilter()
-		listenerFilter.setName( dataFilterChain.name )
-		const config = googleStruct.Struct.fromJavaScript( dataFilterChain.config )
-		listenerFilter.setConfig( config )
-		return listenerFilter
-	  })
-
-	  listener.setListenerFiltersList( listenerChains )
+	  if (dataResource.listener_filters) {
+        const listenerChains = dataResource.listener_filters.map( function ( dataFilterChain ) {
+	 	  const listenerFilter = new listenerPB.ListenerFilter()
+	 	  listenerFilter.setName( dataFilterChain.name )
+	 	  const config = googleStruct.Struct.fromJavaScript( dataFilterChain.config )
+	 	  listenerFilter.setConfig( config )
+	 	  return listenerFilter
+	    })
+	    listener.setListenerFiltersList( listenerChains )
+	  }
 
       // build filter chains 
       const filterChains = dataResource.filter_chains.map( function ( dataFilterChain ) {
