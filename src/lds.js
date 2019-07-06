@@ -56,7 +56,7 @@ function streamListeners(call) {
       const listenerChains = dataResource.listener_filters.map( function ( dataFilterChain ) {
 		const listenerFilter = new listenerPB.ListenerFilter()
 		listenerFilter.setName( dataFilterChain.name )
-		const config = googleStruct.Struct.fromJavaScript( dataFilter.config )
+		const config = googleStruct.Struct.fromJavaScript( dataFilterChain.config )
 		listenerFilter.setConfig( config )
 		return listenerFilter
 	  })
