@@ -76,13 +76,12 @@ function streamListeners(call) {
 			const tlsContext = new certPB.DownstreamTlsContext()
 			const commonTlsCtx = new certPB.CommonTlsContext()
 
-			if (dataFilterChain.tls_context.alpn_protocols) {
-				commonTlsCtx.setAlpnProtocolsList(dataFilterChain.tls_context.alpn_protocols)
+			if (dataFilterChain.tls_context.common_tls_context.alpn_protocols) {
+				commonTlsCtx.setAlpnProtocolsList(dataFilterChain.tls_context.common_tls_context.alpn_protocols)
 			}
 
-			if (dataFilterChain.tls_context.tls_certificates) {
-				const cert_list = dataFilterChain.tls_context.tls_certificates.map( function ( cert ) {
-					console.log(cert)
+			if (dataFilterChain.tls_context.common_tls_context.tls_certificates) {
+				const cert_list = dataFilterChain.tls_context.common_tls_context.tls_certificates.map( function ( cert ) {
 					const tlsCertificate = new certPB.TlsCertificate()
 					const private_key = new basePB.DataSource()
 					if (cert.private_key.filename) {
