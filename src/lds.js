@@ -12,6 +12,8 @@ const messages = require('./util/messages')
 let store
 
 function streamListeners(call) {
+	console.log('connect???')
+	console.log(`dataz? ${require('util').inspect(call)}`)
   call.on('data', function( request ) {
     const params = request.toObject()
     // console.log(JSON.stringify( params, null, 2 ))
@@ -20,7 +22,7 @@ function streamListeners(call) {
     const storedData = store.get( params )
     if ( !storedData ) {
 	//  console.log('NO DATA AVAILABLE')
-	  console.log(`UPDATE (NO DATA): ${Date()}`)
+	  //console.log(`UPDATE (NO DATA): ${Date()}`)
       return //this.end()
     }
     
@@ -28,12 +30,6 @@ function streamListeners(call) {
     const nonce = makeResponseNonce( storedData )
     //console.log(`LDS params.responseNonce ${params.responseNonce} // nonce ${nonce}`)
     if ( params.responseNonce === nonce ) {
-	  const response = new discovery.DiscoveryResponse()
-	  //response.setVersionInfo( 0 )
-	  //response.setTypeUrl( 'type.googleapis.com/envoy.api.v2.Listener' )
-	  //response.setNonce( nonce )
-	  console.log(`UPDATE (NONCE SAME): ${Date()}`)
-	  this.write(response)
       return //this.end()
     }
 
