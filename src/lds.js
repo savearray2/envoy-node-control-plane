@@ -31,6 +31,7 @@ function streamListeners(call) {
 	  //response.setVersionInfo( 0 )
 	  //response.setTypeUrl( 'type.googleapis.com/envoy.api.v2.Listener' )
 	  //response.setNonce( nonce )
+	  console.log(`UPDATE: ${Date()}`)
 	  this.write(response)
       return //this.end()
     }
