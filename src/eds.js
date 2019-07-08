@@ -6,8 +6,15 @@ const messages = require('./util/messages')
 
 // passed storage module
 let store
+const stream_clients = []
 
 function streamEndpoints(call) {
+  stream_clients.push(call)
+  call.on('end', function() {
+    stream_clients = stream_clients.filter( function(value, index, arr) {
+		return value !== call
+	})
+  })
   call.on('data', function( request ) {
     const params = request.toObject()
     // console.log(JSON.stringify( params, null, 2 ))

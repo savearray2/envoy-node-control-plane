@@ -6,8 +6,15 @@ const googlePBAny = require('google-protobuf/google/protobuf/any_pb.js')
 const makeResponseNonce = require('./util/response-nonce')
 
 let store
+const stream_clients = []
 
 function streamRoutes(call) {
+  stream_clients.push(call)
+  call.on('end', function() {
+    stream_clients = stream_clients.filter( function(value, index, arr) {
+		return value !== call
+	})
+  })
   call.on('data', function( request ) {
     const params = request.toObject()
     // console.log(JSON.stringify( params, null, 2 ))

@@ -10,10 +10,15 @@ const makeResponseNonce = require('./util/response-nonce')
 const messages = require('./util/messages')
 
 let store
+const stream_clients = []
 
 function streamListeners(call) {
-	console.log('connect???')
-	console.log(`dataz? ${require('util').inspect(call)}`)
+  stream_clients.push(call)
+  call.on('end', function() {
+    stream_clients = stream_clients.filter( function(value, index, arr) {
+		return value !== call
+	})
+  })
   call.on('data', function( request ) {
     const params = request.toObject()
     // console.log(JSON.stringify( params, null, 2 ))
