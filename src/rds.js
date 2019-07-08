@@ -62,6 +62,10 @@ function streamRoutes(call) {
 					// assign match to route
 					route.setMatch( match )
 
+					if (dataRoute.prefix_rewrite) {
+						route.setPrefixRewrite( dataRoute.prefix_rewrite )
+					}
+
 					// create RouteAction message 
 					// https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/route/route.proto#envoy-api-msg-route-routeaction
 					const routeAction = new routePB.RouteAction()
