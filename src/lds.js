@@ -19,7 +19,8 @@ function streamListeners(call) {
     // get stored data for request
     const storedData = store.get( params )
     if ( !storedData ) {
-    //  console.log('NO DATA AVAILABLE')
+	//  console.log('NO DATA AVAILABLE')
+	  console.log(`UPDATE (NO DATA): ${Date()}`)
       return //this.end()
     }
     
@@ -31,7 +32,7 @@ function streamListeners(call) {
 	  //response.setVersionInfo( 0 )
 	  //response.setTypeUrl( 'type.googleapis.com/envoy.api.v2.Listener' )
 	  //response.setNonce( nonce )
-	  console.log(`UPDATE: ${Date()}`)
+	  console.log(`UPDATE (NONCE SAME): ${Date()}`)
 	  this.write(response)
       return //this.end()
     }
