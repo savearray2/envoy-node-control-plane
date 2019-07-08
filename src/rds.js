@@ -24,9 +24,9 @@ function streamRoutes(call) {
     //console.log(`RDS params.responseNonce ${params.responseNonce} // nonce ${nonce}`)
     if ( params.responseNonce === nonce ) {
 	  const response = new discovery.DiscoveryResponse()
-	  response.setVersionInfo( 0 )
-	  response.setTypeUrl( 'type.googleapis.com/envoy.api.v2.RouteConfiguration' )
-	  response.setNonce( nonce )
+	  //response.setVersionInfo( 0 )
+	  //response.setTypeUrl( 'type.googleapis.com/envoy.api.v2.RouteConfiguration' )
+	  //response.setNonce( nonce )
 	  this.write(response)
       return //this.end()
     }
