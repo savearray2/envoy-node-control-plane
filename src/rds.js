@@ -67,8 +67,8 @@ function streamRoutes(call) {
 					const routeAction = new routePB.RouteAction()
 					routeAction.setCluster( dataRoute.route.cluster )
 
-					if (dataRoute.prefix_rewrite) {
-						routeAction.setPrefixRewrite( dataRoute.prefix_rewrite )
+					if (dataRoute.route.prefix_rewrite) {
+						routeAction.setPrefixRewrite( dataRoute.route.prefix_rewrite )
 					}
 
 					// assign route action to route
