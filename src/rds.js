@@ -57,7 +57,14 @@ function streamRoutes(call) {
 					// create RouteMatch message 
 					// https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/route/route.proto#envoy-api-msg-route-routematch
 					const match = new routePB.RouteMatch()
-					match.setPrefix( dataRoute.match.prefix )
+
+					if (dataRoute.match.prefix) {
+						match.setPrefix( dataRoute.match.prefix )
+					}
+
+					if (dataRoute.match.path) {
+						match.setPath( dataRoute.match.path )
+					}
 
 					// assign match to route
 					route.setMatch( match )
