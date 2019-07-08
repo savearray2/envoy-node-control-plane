@@ -7,7 +7,7 @@ const makeResponseNonce = require('./util/response-nonce')
 const messages = require('./util/messages')
 
 let store
-const stream_clients = []
+let stream_clients = []
 
 function streamClusters(call) {
   stream_clients.push(call)

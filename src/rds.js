@@ -6,7 +6,7 @@ const googlePBAny = require('google-protobuf/google/protobuf/any_pb.js')
 const makeResponseNonce = require('./util/response-nonce')
 
 let store
-const stream_clients = []
+let stream_clients = []
 
 function streamRoutes(call) {
   stream_clients.push(call)

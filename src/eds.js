@@ -6,7 +6,7 @@ const messages = require('./util/messages')
 
 // passed storage module
 let store
-const stream_clients = []
+let stream_clients = []
 
 function streamEndpoints(call) {
   stream_clients.push(call)
