@@ -175,6 +175,8 @@ exports.registerServices = function ( server, configStore ) {
 
 exports.pushUpdate = function () {
 	for (let i = 0; i < stm_client.length; i++) {
-		update( stm_client[i].request, stm_client[i].client, true )
+		if (stm_client[i].request) {
+			update( stm_client[i].request, stm_client[i].client, true )
+		}
 	}
 }
