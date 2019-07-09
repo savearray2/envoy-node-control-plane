@@ -9,30 +9,19 @@ const messages = require('./util/messages')
 let store
 let stream_clients = []
 
-function streamClusters(call) {
-  stream_clients.push({ client: call })
-  call.on('end', function() {
-    stream_clients = stream_clients.filter( function(value, index, arr) {
-		return value.client !== call
-	})
-  })
-  call.on('data', function( request ) {
-    const params = request.toObject()
-    // console.log(JSON.stringify( params, null, 2 ))
-
-    // get stored data for request
-    const storedData = store.get( params )
-    if ( !storedData ) {
-      // console.log('NO DATA AVAILABLE')
-      return //this.end()
-    }
-    
-    // check for nonce to stop infinite updates
-    const nonce = makeResponseNonce( storedData )
-    //console.log(`CDS params.responseNonce ${params.responseNonce} // nonce ${nonce}`)
-    if ( params.responseNonce === nonce ) {
-      return //this.end()
-    }
+function update(request, call, force) {
+	const params = request.toObject()
+	const stm_client = stream_clients.filter(val => val.client === call)[0]
+	stm_client.params = params
+	// get stored data for request
+	const storedData = store.get( params )
+	if ( !force && !storedData ) {
+		return
+	}
+	const nonce = makeResponseNonce( storedData )
+	if ( !force && params.responseNonce === nonce ) {
+		return
+	}
 
     // build discovery response
     const response = new discovery.DiscoveryResponse()
@@ -81,7 +70,18 @@ function streamClusters(call) {
     response.setResourcesList( resourcesList )
     
     // write response
-    this.write(response)
+    call.write(response)
+}
+
+function streamClusters(call) {
+  stream_clients.push({ client: call })
+  call.on('end', function() {
+    stream_clients = stream_clients.filter( function(value, index, arr) {
+		return value.client !== call
+	})
+  })
+  call.on('data', function( request ) {
+	update( request, call, false )
   })
 }
 
