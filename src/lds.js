@@ -13,21 +13,15 @@ let store
 let stream_clients = []
 
 function update(request, force) {
-	let nonce
-	if (!force) {
-		const params = request.toObject()
-		// get stored data for request
-		const storedData = store.get( params )
-		if ( !storedData ) {
-			return
-		}
-		
-		// check for nonce to stop infinite updates
-		nonce = makeResponseNonce( storedData )
-		//console.log(`LDS params.responseNonce ${params.responseNonce} // nonce ${nonce}`)
-		if ( params.responseNonce === nonce ) {
-			return
-		}
+	const params = request.toObject()
+	// get stored data for request
+	const storedData = store.get( params )
+	if ( !force && !storedData ) {
+		return
+	}
+	const nonce = makeResponseNonce( storedData )
+	if ( !force && params.responseNonce === nonce ) {
+		return
 	}
 
     // build discovery response
