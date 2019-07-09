@@ -13,6 +13,7 @@ let store
 let stream_clients = []
 
 function update(request, force) {
+	let nonce
 	if (!force) {
 		const params = request.toObject()
 		// get stored data for request
@@ -22,7 +23,7 @@ function update(request, force) {
 		}
 		
 		// check for nonce to stop infinite updates
-		const nonce = makeResponseNonce( storedData )
+		nonce = makeResponseNonce( storedData )
 		//console.log(`LDS params.responseNonce ${params.responseNonce} // nonce ${nonce}`)
 		if ( params.responseNonce === nonce ) {
 			return

@@ -11,7 +11,7 @@ let stream_clients = []
 function update(request, force) {
 	const params = request.toObject()
     // console.log(JSON.stringify( params, null, 2 ))
-
+	let nonce
 	if (!force) {
 		// get stored data for request
 		const storedData = store.get( params )
@@ -21,7 +21,7 @@ function update(request, force) {
 		}
 
 		// check for nonce to stop infinite updates
-		const nonce = makeResponseNonce( storedData )
+		nonce = makeResponseNonce( storedData )
 		//console.log(`RDS params.responseNonce ${params.responseNonce} // nonce ${nonce}`)
 		if ( params.responseNonce === nonce ) {
 		return //this.end()
