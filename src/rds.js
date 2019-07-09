@@ -8,7 +8,7 @@ const makeResponseNonce = require('./util/response-nonce')
 let store
 let stream_clients = []
 
-function update(request, force) {
+function update(request, call, force) {
 	const params = request.toObject()
 	// get stored data for request
 	const storedData = store.get( params )
@@ -96,7 +96,7 @@ function update(request, force) {
     response.setResourcesList( resourcesList )
 
     // write response
-    this.write(response)
+    call.write(response)
 }
 
 function streamRoutes(call) {
@@ -107,7 +107,7 @@ function streamRoutes(call) {
 	})
   })
   call.on('data', function( request ) {
-	update( request, false )
+	update( request, call, false )
   })
 }
 
