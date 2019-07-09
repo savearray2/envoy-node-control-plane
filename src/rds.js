@@ -8,30 +8,25 @@ const makeResponseNonce = require('./util/response-nonce')
 let store
 let stream_clients = []
 
-function streamRoutes(call) {
-  stream_clients.push(call)
-  call.on('end', function() {
-    stream_clients = stream_clients.filter( function(value, index, arr) {
-		return value !== call
-	})
-  })
-  call.on('data', function( request ) {
-    const params = request.toObject()
+function update(request, force) {
+	const params = request.toObject()
     // console.log(JSON.stringify( params, null, 2 ))
 
-    // get stored data for request
-    const storedData = store.get( params )
-    if ( !storedData ) {
-    //  console.log('NO DATA AVAILABLE')
-      return //this.end()
-    }
+	if (!force) {
+		// get stored data for request
+		const storedData = store.get( params )
+		if ( !storedData ) {
+		//  console.log('NO DATA AVAILABLE')
+		return //this.end()
+		}
 
-    // check for nonce to stop infinite updates
-    const nonce = makeResponseNonce( storedData )
-    //console.log(`RDS params.responseNonce ${params.responseNonce} // nonce ${nonce}`)
-    if ( params.responseNonce === nonce ) {
-      return //this.end()
-    }
+		// check for nonce to stop infinite updates
+		const nonce = makeResponseNonce( storedData )
+		//console.log(`RDS params.responseNonce ${params.responseNonce} // nonce ${nonce}`)
+		if ( params.responseNonce === nonce ) {
+		return //this.end()
+		}
+	}
 
     // build discovery response
     const response = new discovery.DiscoveryResponse()
@@ -110,6 +105,17 @@ function streamRoutes(call) {
 
     // write response
     this.write(response)
+}
+
+function streamRoutes(call) {
+  stream_clients.push({ client: call })
+  call.on('end', function() {
+    stream_clients = stream_clients.filter( function(value, index, arr) {
+		return value.client !== call
+	})
+  })
+  call.on('data', function( request ) {
+	update( request, false )
   })
 }
 

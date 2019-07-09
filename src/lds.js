@@ -12,31 +12,22 @@ const messages = require('./util/messages')
 let store
 let stream_clients = []
 
-function streamListeners(call) {
-  stream_clients.push(call)
-  call.on('end', function() {
-    stream_clients = stream_clients.filter( function(value, index, arr) {
-		return value !== call
-	})
-  })
-  call.on('data', function( request ) {
-    const params = request.toObject()
-    // console.log(JSON.stringify( params, null, 2 ))
-
-    // get stored data for request
-    const storedData = store.get( params )
-    if ( !storedData ) {
-	//  console.log('NO DATA AVAILABLE')
-	  //console.log(`UPDATE (NO DATA): ${Date()}`)
-      return //this.end()
-    }
-    
-    // check for nonce to stop infinite updates
-    const nonce = makeResponseNonce( storedData )
-    //console.log(`LDS params.responseNonce ${params.responseNonce} // nonce ${nonce}`)
-    if ( params.responseNonce === nonce ) {
-      return //this.end()
-    }
+function update(request, force) {
+	if (!force) {
+		const params = request.toObject()
+		// get stored data for request
+		const storedData = store.get( params )
+		if ( !storedData ) {
+			return
+		}
+		
+		// check for nonce to stop infinite updates
+		const nonce = makeResponseNonce( storedData )
+		//console.log(`LDS params.responseNonce ${params.responseNonce} // nonce ${nonce}`)
+		if ( params.responseNonce === nonce ) {
+			return
+		}
+	}
 
     // build discovery response
     const response = new discovery.DiscoveryResponse()
@@ -155,6 +146,17 @@ function streamListeners(call) {
 
     // write response
     this.write(response)
+}
+
+function streamListeners(call) {
+  stream_clients.push({ client: call })
+  call.on('end', function() {
+    stream_clients = stream_clients.filter( function(value, index, arr) {
+		return value.client !== call
+	})
+  })
+  call.on('data', function( request ) {
+	update( request, false )
   })
 }
 
@@ -172,4 +174,8 @@ exports.registerServices = function ( server, configStore ) {
       fetchListeners: fetchListeners
     }
   )
+}
+
+exports.pushUpdate = function () {
+	
 }

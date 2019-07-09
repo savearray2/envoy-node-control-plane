@@ -9,10 +9,10 @@ let store
 let stream_clients = []
 
 function streamEndpoints(call) {
-  stream_clients.push(call)
+  stream_clients.push({ client: call })
   call.on('end', function() {
     stream_clients = stream_clients.filter( function(value, index, arr) {
-		return value !== call
+		return value.client !== call
 	})
   })
   call.on('data', function( request ) {
