@@ -4,6 +4,11 @@ const rdsPB = require('./pb/envoy/api/v2/rds_pb')
 const routePB = require('./pb/envoy/api/v2/route/route_pb')
 const googlePBAny = require('google-protobuf/google/protobuf/any_pb.js')
 const makeResponseNonce = require('./util/response-nonce')
+const EventEmitter = require('events')
+
+class StreamStatusEmitter extends EventEmitter {}
+const statusEmitter = new StreamStatusEmitter()
+exports.status = statusEmitter
 
 let store
 let stream_clients = []
@@ -103,9 +108,17 @@ function update(request, call, force) {
 
 function streamRoutes(call) {
   stream_clients.push({ client: call })
+  statusEmitter.emit('connect', {
+	client: call,
+	count: stream_clients.length
+  })
   call.on('end', function() {
     stream_clients = stream_clients.filter( function(value, index, arr) {
 		return value.client !== call
+	})
+	statusEmitter.emit('disconnect', {
+		client: call,
+		count: stream_clients.length
 	})
   })
   call.on('data', function( request ) {

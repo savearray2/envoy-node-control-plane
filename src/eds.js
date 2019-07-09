@@ -3,6 +3,11 @@ const discovery = require('./pb/envoy/api/v2/discovery_pb')
 const googlePBAny = require('google-protobuf/google/protobuf/any_pb.js')
 const makeResponseNonce = require('./util/response-nonce')
 const messages = require('./util/messages')
+const EventEmitter = require('events')
+
+class StreamStatusEmitter extends EventEmitter {}
+const statusEmitter = new StreamStatusEmitter()
+exports.status = statusEmitter
 
 // passed storage module
 let store
@@ -51,9 +56,17 @@ function update(request, call, force) {
 
 function streamEndpoints(call) {
   stream_clients.push({ client: call })
+  statusEmitter.emit('connect', {
+	client: call,
+	count: stream_clients.length
+  })
   call.on('end', function() {
     stream_clients = stream_clients.filter( function(value, index, arr) {
 		return value.client !== call
+	})
+	statusEmitter.emit('disconnect', {
+		client: call,
+		count: stream_clients.length
 	})
   })
   call.on('data', function( request ) {
