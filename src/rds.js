@@ -10,6 +10,8 @@ let stream_clients = []
 
 function update(request, call, force) {
 	const params = request.toObject()
+	const stm_client = stream_clients.filter(val => val.client === call)[0]
+	stm_client.params = params
 	// get stored data for request
 	const storedData = store.get( params )
 	if ( !force && !storedData ) {
