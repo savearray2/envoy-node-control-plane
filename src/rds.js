@@ -4,6 +4,7 @@ const rdsPB = require('./pb/envoy/api/v2/rds_pb')
 const routePB = require('./pb/envoy/api/v2/route/route_pb')
 const googlePBAny = require('google-protobuf/google/protobuf/any_pb.js')
 const makeResponseNonce = require('./util/response-nonce')
+const googlePBDuration = require('google-protobuf/google/protobuf/duration_pb.js')
 const EventEmitter = require('events')
 
 class StreamStatusEmitter extends EventEmitter {}
@@ -77,6 +78,12 @@ function update(request, call, force) {
 
 					if (dataRoute.route.prefix_rewrite) {
 						routeAction.setPrefixRewrite( dataRoute.route.prefix_rewrite )
+					}
+
+					if (dataRoute.route.timeout) {
+						const duration = new googlePBDuration.Duration()
+						duration.setSeconds( dataRoute.route.timeout )
+						routeAction.setTimeout( duration )
 					}
 
 					// assign route action to route
