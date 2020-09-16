@@ -9,6 +9,7 @@ const googleStruct = require('google-protobuf/google/protobuf/struct_pb.js')
 const makeResponseNonce = require('./util/response-nonce')
 const messages = require('./util/messages')
 const EventEmitter = require('events')
+const { Duration } = require('google-protobuf/google/protobuf/duration_pb')
 
 class StreamStatusEmitter extends EventEmitter {}
 const statusEmitter = new StreamStatusEmitter()
@@ -121,6 +122,11 @@ function update(request, call, force) {
           // build config Struct
           // https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct
           const config = googleStruct.Struct.fromJavaScript( dataFilter.config )
+
+		  if ( dataFilter.config.request_timeout ) {
+			const rt = new Duration()
+			config.request_timeout = rt.setSeconds( dataFilter.config.request_timeout )
+		  }
 
           // assign config to filter 
 		  filter.setConfig( config )
